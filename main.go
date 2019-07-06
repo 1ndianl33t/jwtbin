@@ -64,14 +64,23 @@ func main() {
 	// jwtbin -secret aaa -c sub:1 -c role:admin -c another:claim 
 	var passedClaims passedClaimsSlice
 
-	jwtSecretPtr := flag.String("secret", envJwtSecret, "JWT Secret (Prefer 'JWT_SECRET' Environment Variable)")	
+	jwtSecretPtr := flag.String("secret", "none", "JWT Secret (Prefer 'JWT_SECRET' Environment Variable)")	
 	expDiffPtr := flag.String("exp-diff", "none", "Expiration Claim (Difference In +/- Seconds from now: +3600, -1000)")
 	nbfDiffPtr := flag.String("nbf-diff", "none", "Not Before Claim (Difference In +/- Seconds from now: +3600, -1000)")
 	iatDiffPtr := flag.String("iat-diff", "none", "Not Before Claim (Difference In +/- Seconds from now: +3600, -1000)")
+
 	flag.Var(&passedClaims, "c", "List of Additional Claims (Passed in 'key:value' format)")
 	flag.Parse()
 
-	if len(*jwtSecretPtr) < 8 {
+	var jwtSecret string
+
+	if *jwtSecretPtr == "none" {
+		jwtSecret = envJwtSecret
+	} else {
+		jwtSecret = *jwtSecretPtr
+	}
+
+	if len(jwtSecret) < 8 {
 		fmt.Fprintf(os.Stderr, "error: %s\n", "Secret too short")
         os.Exit(1)
 	}
@@ -107,7 +116,7 @@ func main() {
 	// you would like it to contain.
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	jwtSecretStrBytes := []byte(*jwtSecretPtr)
+	jwtSecretStrBytes := []byte(jwtSecret)
 	// Sign and get the complete encoded token as a string using the secret
 	tokenString, err := token.SignedString(jwtSecretStrBytes)
 
