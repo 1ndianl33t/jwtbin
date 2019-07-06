@@ -65,8 +65,9 @@ func main() {
 	var passedClaims passedClaimsSlice
 
 	jwtSecretPtr := flag.String("secret", envJwtSecret, "JWT Secret (Prefer 'JWT_SECRET' Environment Variable)")	
-	expDiffPtr := flag.String("exp", "none", "Expiration Claim (In +/- Seconds from now: +3600, -1000)")
-	nbfDiffPtr := flag.String("nbf", "none", "Not Before Claim (In +/- Seconds from now: +3600, -1000)")
+	expDiffPtr := flag.String("exp-diff", "none", "Expiration Claim (Difference In +/- Seconds from now: +3600, -1000)")
+	nbfDiffPtr := flag.String("nbf-diff", "none", "Not Before Claim (Difference In +/- Seconds from now: +3600, -1000)")
+	iatDiffPtr := flag.String("iat-diff", "none", "Not Before Claim (Difference In +/- Seconds from now: +3600, -1000)")
 	flag.Var(&passedClaims, "c", "List of Additional Claims (Passed in 'key:value' format)")
 	flag.Parse()
 
@@ -84,6 +85,10 @@ func main() {
 	if *nbfDiffPtr != "none" {
 		nbf := unixDiffForClaim(*nbfDiffPtr)
 		claims["nbf"] = nbf
+	}
+	if *iatDiffPtr != "none" {
+		iat := unixDiffForClaim(*iatDiffPtr)
+		claims["iat"] = iat
 	}
 
 	for _, passedClaim := range passedClaims {
