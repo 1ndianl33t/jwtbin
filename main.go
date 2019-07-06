@@ -1,32 +1,32 @@
 package main
 
 import (
-	"os"
 	"flag"
 	"fmt"
-	"time"
+	"github.com/dgrijalva/jwt-go"
+	"os"
 	"strconv"
 	"strings"
-	"github.com/dgrijalva/jwt-go" 
+	"time"
 )
 
 type passedClaimsSlice []string
- 
+
 func (claims *passedClaimsSlice) String() string {
-    return fmt.Sprintf("%d", *claims)
+	return fmt.Sprintf("%d", *claims)
 }
- 
+
 // The second method is Set(value string) error
 func (claims *passedClaimsSlice) Set(value string) error {
 	*claims = append(*claims, value)
-    return nil
+	return nil
 }
 
 func unixDiffForClaim(diffSecondsStr string) int64 {
 
 	var secondsStr string
 
-	if (! strings.HasPrefix(diffSecondsStr, "+") && ! strings.HasPrefix(diffSecondsStr, "-") ) {
+	if !strings.HasPrefix(diffSecondsStr, "+") && !strings.HasPrefix(diffSecondsStr, "-") {
 		var str strings.Builder
 		str.WriteString("+")
 		str.WriteString(diffSecondsStr)
@@ -34,7 +34,7 @@ func unixDiffForClaim(diffSecondsStr string) int64 {
 	}
 	secondsStr = diffSecondsStr[1:]
 
-	now := time.Now().Unix() 
+	now := time.Now().Unix()
 
 	secondsInt, err := strconv.Atoi(secondsStr)
 
@@ -47,7 +47,7 @@ func unixDiffForClaim(diffSecondsStr string) int64 {
 
 	var final int64
 	if strings.HasPrefix(diffSecondsStr, "+") {
-		final =  now + seconds
+		final = now + seconds
 	} else {
 		final = now - seconds
 	}
@@ -59,12 +59,12 @@ func unixDiffForClaim(diffSecondsStr string) int64 {
 func main() {
 	envJwtSecret := os.Getenv("JWT_SECRET")
 	if len(envJwtSecret) == 0 {
-      	envJwtSecret = ""
-  	}
-	// jwtbin -secret aaa -c sub:1 -c role:admin -c another:claim 
+		envJwtSecret = ""
+	}
+	// jwtbin -secret aaa -c sub:1 -c role:admin -c another:claim
 	var passedClaims passedClaimsSlice
 
-	jwtSecretPtr := flag.String("secret", "none", "JWT Secret (Prefer 'JWT_SECRET' Environment Variable)")	
+	jwtSecretPtr := flag.String("secret", "none", "JWT Secret (Prefer 'JWT_SECRET' Environment Variable)")
 	expDiffPtr := flag.String("exp-diff", "none", "Expiration Claim (Difference In +/- Seconds from now: +3600, -1000)")
 	nbfDiffPtr := flag.String("nbf-diff", "none", "Not Before Claim (Difference In +/- Seconds from now: +3600, -1000)")
 	iatDiffPtr := flag.String("iat-diff", "none", "Not Before Claim (Difference In +/- Seconds from now: +3600, -1000)")
@@ -82,11 +82,11 @@ func main() {
 
 	if len(jwtSecret) < 8 {
 		fmt.Fprintf(os.Stderr, "error: %s\n", "Secret too short")
-        os.Exit(1)
+		os.Exit(1)
 	}
 
 	claims := jwt.MapClaims{}
-	
+
 	if *expDiffPtr != "none" {
 		exp := unixDiffForClaim(*expDiffPtr)
 		claims["exp"] = exp
@@ -104,14 +104,13 @@ func main() {
 		keyValStr := strings.Split(passedClaim, ":")
 		if len(keyValStr) < 2 {
 			fmt.Fprintf(os.Stderr, "error: %s\n", "Key/Value pairs must be passed in 'key:value' format.")
-        	os.Exit(1)
+			os.Exit(1)
 		}
 		key := keyValStr[0]
 		valSlice := keyValStr[1:]
 		val := strings.Join(valSlice, ":")
 		claims[key] = val
-    }
-
+	}
 
 	// Create a new token object, specifying signing method and the claims
 	// you would like it to contain.
@@ -126,6 +125,5 @@ func main() {
 	}
 
 	fmt.Println(tokenString)
-
 
 }
