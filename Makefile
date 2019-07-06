@@ -22,6 +22,7 @@ build-all:
 	$(foreach GOOS, $(PLATFORMS),\
 	$(foreach GOARCH, $(ARCHITECTURES),\
 	$(shell export GOOS=$(GOOS); export GOARCH=$(GOARCH); go build -o $(BIN_DIR)/$(BINARY)-$(GOOS)-$(GOARCH) $(TARGET))))
+	@echo "Build Complete"
 
 install:
 	go install ${LDFLAGS}
@@ -31,6 +32,6 @@ deps:
 
 # Remove only what we've created
 clean:
-	rm -f "${ROOT_DIR}/${BIN_DIR}/*"
+	rm -rf "${ROOT_DIR}/${BIN_DIR}/${BINARY}*"
 
 .PHONY: check clean install build-all all
