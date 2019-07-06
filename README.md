@@ -8,7 +8,7 @@ You can set the secret as the environment variable JWT_SECRET (Preferred) or use
 
 ### Claims
 
-Claims can be passed in useing the '-c key:value" option. The key and value must be separated by a ":" and not contain more than one semi-colon (for now).
+Claims can be passed in useing the '-c key:value" option. The key and value must be separated by a ":".
 
 PRs are welcome.
 

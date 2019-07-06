@@ -102,12 +102,13 @@ func main() {
 
 	for _, passedClaim := range passedClaims {
 		keyValStr := strings.Split(passedClaim, ":")
-		if len(keyValStr) != 2 {
-			fmt.Fprintf(os.Stderr, "error: %s\n", "Key/Value pairs must be passe in 'key:value' format.")
+		if len(keyValStr) < 2 {
+			fmt.Fprintf(os.Stderr, "error: %s\n", "Key/Value pairs must be passed in 'key:value' format.")
         	os.Exit(1)
 		}
 		key := keyValStr[0]
-		val := keyValStr[1]
+		valSlice := keyValStr[1:]
+		val := strings.Join(valSlice, ":")
 		claims[key] = val
     }
 
